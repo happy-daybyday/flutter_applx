@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:rflutter_alert/rflutter_alert.dart'; //弹窗警告，要配置yaml
-
-import 'package:flutter_applx/quiz_tools.dart';
-
-
-QuizTools quizTools = QuizTools();
+import 'questions.dart';
 
 void main() => runApp(MyApp());
 
@@ -15,14 +10,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primarySwatch: Colors.blue,
+      ),
+      home: Scaffold(
         backgroundColor: Colors.grey.shade900,
         body: SafeArea(
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
             child: TrueFalsePage(),
           ),
-      ),
-      home: Scaffold(
         ),
       ),
     );
@@ -38,32 +33,17 @@ class TrueFalsePage extends StatefulWidget {
 
 class _TrueFalsePageState extends State<TrueFalsePage> {
   List<Widget> answerTrack = [];
+//  List<String> questions = ['今天你开心么？', '早上需要很长时间才能起床？', '我总是很焦虑？'];
+//  List<bool> answers = [true, false, false];
+  int questionNum = 0;
+//  Questions question = Questions(q: '今天你开心么?', a: true);
+  List<Questions> questionList = [
+    Questions(question: '早上需要很长时间才能起床？', answer: false),
+    Questions(question: '今天你开心么？', answer: true),
+    Questions(question: '我总是很焦虑？', answer: true),
+  ];
 
-  void checkAnswer(bool userPickedAnswer) {
-    bool correctAnswer = quizTools.getAnswer();
-    setState(() {
-      if (quizTools.isFinished() == true) {
-        Alert(context: context, title: '恭喜您!', desc: '已经全部完成').show();
-        quizTools.reset();
-        answerTrack = [];
-      } else {
-        if (userPickedAnswer == correctAnswer) {
-          answerTrack.add(Icon(
-            Icons.check,
-            color: Colors.green,
-          ));
-        } else {
-          answerTrack.add(
-            Icon(
-              Icons.close,
-              color: Colors.red,
-            ),
-          );
-        }
-        quizTools.nextQuestion();
-      }
-    });
-  }
+  void checkAnswer() {}
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +55,7 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                quizTools.getQuestion(),
+                questionList[questionNum].question,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 25.0, color: Colors.white),
               ),
@@ -90,7 +70,17 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
           padding: EdgeInsets.all(15.0),
           child: RawMaterialButton(
               onPressed: () {
-                checkAnswer(true);
+                setState(() {
+                  if (questionNum < questionList.length - 1) {
+                    answerTrack.add(
+                      Icon(
+                        Icons.check,
+                        color: Colors.green,
+                      ),
+                    );
+                    questionNum++;
+                  }
+                });
               },
               fillColor: Colors.white,
               shape: RoundedRectangleBorder(
@@ -107,7 +97,17 @@ class _TrueFalsePageState extends State<TrueFalsePage> {
           padding: EdgeInsets.all(15.0),
           child: RawMaterialButton(
             onPressed: () {
-              checkAnswer(false);
+              setState(() {
+                if (questionNum < questionList.length - 1) {
+                  answerTrack.add(
+                    Icon(
+                      Icons.close,
+                      color: Colors.red,
+                    ),
+                  );
+                  questionNum++;
+                }
+              });
             },
             fillColor: Colors.red,
             constraints: BoxConstraints(minHeight: 38.0, minWidth: 300.0),
